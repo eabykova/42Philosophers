@@ -6,7 +6,7 @@
 /*   By: mmicheli <mmicheli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/09 19:06:14 by mmicheli          #+#    #+#             */
-/*   Updated: 2022/07/10 19:29:46 by mmicheli         ###   ########.fr       */
+/*   Updated: 2022/07/16 16:14:08 by mmicheli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,12 @@ t_phil	*new_phil(t_data *data, int id)
 		new->die_t = data->die_time;
 		new->micro = &data->micro;
 		new->next = NULL;
+		new->is_dead = 0;
+		new->has_eat = 0;
 		if (pthread_mutex_init(&new->my_fork, NULL))
 		{
 			printf(MUTEX_ERROR);
-			return (0);
+			return (NULL);
 		}
 	}
 	return (new);
@@ -64,4 +66,16 @@ int	ft_lstadd_back(t_phil **lst, t_phil *new)
 			return (0);
 	}
 	return (1);
+}
+
+void	ft_lstclear(t_phil **lst)
+{
+	t_phil	*buf;
+
+	while (*lst)
+	{
+		buf = (*lst)->next;
+		free(*lst);
+		*lst = buf;
+	}
 }

@@ -11,7 +11,6 @@ OBJ		=	$(SRC:%.c=%.o)
 D_FIL	=	$(SRC:%.c=%.d)
 
 FLAG	=	-g -Wall -Werror -Wextra
-#-fsanitize=address -g
 
 CC		=	gcc -O2 -MD
 RM		=	rm -f

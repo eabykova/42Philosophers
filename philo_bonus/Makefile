@@ -1,12 +1,15 @@
 NAME	=	philo_bonus
 HEAD	=	philo_bonus.h
 
-SRC		=	main_bonus.c
+SRC		=	main_bonus.c \
+				src/initialisation_bonus.c \
+				src/utils_bonus.c \
+				src/daily_bonus.c \
+				src/inspection_bonus.c
 OBJ		=	$(SRC:%.c=%.o)
 D_FIL	=	$(SRC:%.c=%.d)
 
 FLAG	=	-g -Wall -Werror -Wextra
-#-fsanitize=address -g
 
 CC		=	gcc -O2 -MD
 RM		=	rm -f

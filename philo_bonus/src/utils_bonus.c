@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmicheli <mmicheli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/26 15:45:32 by mmicheli          #+#    #+#             */
-/*   Updated: 2022/07/16 18:08:51 by mmicheli         ###   ########.fr       */
+/*   Created: 2022/07/18 10:29:16 by mmicheli          #+#    #+#             */
+/*   Updated: 2022/07/21 14:20:09 by mmicheli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../includes/philo_bonus.h"
 
 static int	ft_pos_num(char *str)
 {
@@ -64,4 +64,10 @@ void	my_usleep(int ms_time)
 	usleep(ms_time * 900);
 	while ((ms_time + start) > cur_t())
 		usleep(250);
+}
+
+void	ft_craft_error(char *message, int exit_code)
+{
+	printf("%s\n", message);
+	exit(exit_code);
 }

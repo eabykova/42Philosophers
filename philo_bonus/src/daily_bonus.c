@@ -1,66 +1,70 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   daily.c                                            :+:      :+:    :+:   */
+/*   daily_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmicheli <mmicheli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/10 20:40:33 by mmicheli          #+#    #+#             */
-/*   Updated: 2022/07/18 10:04:33 by mmicheli         ###   ########.fr       */
+/*   Created: 2022/07/20 14:50:00 by mmicheli          #+#    #+#             */
+/*   Updated: 2022/07/25 16:21:22 by mmicheli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/philo.h"
+#include "../includes/philo_bonus.h"
 
 void	message(const char *type, t_phil *p_phil, long time)
 {
-	pthread_mutex_lock(p_phil->micro);
+	sem_wait(p_phil->data_ptr->micro);
 	printf("%ld %s_%d %s", time, PH, p_phil->phil_id, type);
-	pthread_mutex_unlock(p_phil->micro);
+	sem_post(p_phil->data_ptr->micro);
 }
 
-static void	eating(t_phil *p_phil)
+void	eating(t_phil *p_phil)
 {
-	pthread_mutex_lock(&p_phil->my_fork);
+	sem_wait(p_phil->data_ptr->fork);
 	message(R_FORK, p_phil, cur_t() - p_phil->start_time);
-	pthread_mutex_lock(&p_phil->next->my_fork);
+	sem_wait(p_phil->data_ptr->fork);
 	message(L_FORK, p_phil, cur_t() - p_phil->start_time);
-	message(EAT, p_phil, cur_t() - p_phil->start_time);
 	p_phil->last_eating = cur_t();
+	message(EAT, p_phil, cur_t() - p_phil->start_time);
 	my_usleep(p_phil->eat_time);
-	p_phil->has_eat += 1;
-	pthread_mutex_unlock(&p_phil->my_fork);
-	pthread_mutex_unlock(&p_phil->next->my_fork);
+	sem_post(p_phil->data_ptr->fork);
+	sem_post(p_phil->data_ptr->fork);
+}
+
+void	sleeping(t_phil *p_phil)
+{
 	message(SLEEP, p_phil, cur_t() - p_phil->start_time);
 	my_usleep(p_phil->sleep_time);
-	message(THINK, p_phil, cur_t() - p_phil->start_time);
 }
 
-void	*daily(void *phil)
+int	dying(t_phil *p_phil)
 {
-	t_phil	*p_phil;
+	if (cur_t() - p_phil->last_eating > p_phil->die_time)
+	{
+		sem_wait(p_phil->data_ptr->micro);
+		printf("%ld %s_%d %s", cur_t() - p_phil->start_time, PH, \
+				p_phil->phil_id, DIE);
+		return (1);
+	}
+	return (0);
+}
 
-	p_phil = (t_phil *)phil;
+void	daily(t_phil *p_phil)
+{
+	pthread_t	inspect;
+
+	pthread_create(&inspect, NULL, inspection, p_phil);
+	pthread_detach(inspect);
 	if (p_phil->phil_id % 2 == 0)
 		my_usleep(200);
 	while (p_phil->times_to_eat)
 	{
+		message(THINK, p_phil, cur_t() - p_phil->start_time);
 		eating(p_phil);
-		if (cur_t() - p_phil->last_eating > p_phil->die_t)
-		{
-			message(DIE, p_phil, cur_t() - p_phil->start_time);
-			pthread_mutex_lock(p_phil->micro);
-			p_phil->is_dead = 1;
-			break ;
-		}
+		sleeping(p_phil);
 		if (p_phil->times_to_eat != -1)
 			p_phil->times_to_eat -= 1;
-		if (p_phil->times_to_eat == 0)
-		{
-			pthread_mutex_lock(p_phil->micro);
-			p_phil->has_eat = -1;
-			break ;
-		}
 	}
-	return (0);
+	exit(0);
 }

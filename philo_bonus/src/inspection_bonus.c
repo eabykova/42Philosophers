@@ -1,38 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   inspection_bonus.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmicheli <mmicheli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/04 18:43:25 by mmicheli          #+#    #+#             */
-/*   Updated: 2022/07/04 18:45:20 by mmicheli         ###   ########.fr       */
+/*   Created: 2022/07/20 13:23:45 by mmicheli          #+#    #+#             */
+/*   Updated: 2022/07/25 16:31:42 by mmicheli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./includes/philo.h"
+#include "../includes/philo_bonus.h"
 
-int	main(int argc, char **argv)
+void	*inspection(void *phil)
 {
-	t_data	data;
+	t_phil	*p_phil;
 
-	if (argc == 5 || argc == 6)
+	p_phil = (t_phil *)phil;
+	while (1)
 	{
-		if (check(&data, argv))
+		if (cur_t() > (p_phil->last_eating + p_phil->die_time))
 		{
-			printf("All is good\n");
-			if (!init(&data))
-				printf(MALLOC_ERROR);
+			sem_wait(p_phil->data_ptr->micro);
+			printf("%ld %s_%d %s", cur_t() - p_phil->start_time, PH, \
+				p_phil->phil_id, DIE);
+			exit (0);
 		}
-		else
-			printf(ARGS_ERROR);
-	}
-	else
-	{
-		if (argc < 5)
-			printf(FEW_ARGS);
-		else
-			printf(MUCH_ARGS);
+		my_usleep(5);
 	}
 	return (0);
 }

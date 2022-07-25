@@ -6,7 +6,7 @@
 /*   By: mmicheli <mmicheli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/22 20:28:25 by mmicheli          #+#    #+#             */
-/*   Updated: 2022/07/13 17:38:47 by mmicheli         ###   ########.fr       */
+/*   Updated: 2022/07/25 15:52:51 by mmicheli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <pthread.h>
-# include <time.h>
 # include <sys/time.h>
 
 # define ARGS_ERROR "Error in args. You must use positive digit only. Stop\n"
@@ -43,8 +42,10 @@ typedef struct s_phil
 	long				start_time;
 	long				eat_time;
 	long				sleep_time;
-	int					last_eating;
+	long				last_eating;
 	int					die_t;
+	int					is_dead;
+	int					has_eat;
 	struct s_phil		*next;
 	pthread_mutex_t		*micro;
 	pthread_mutex_t		my_fork;
@@ -57,6 +58,7 @@ typedef struct s_data
 	int				eat_time;
 	int				sleep_time;
 	int				dinner_num;
+	long			start_time;
 	pthread_mutex_t	micro;
 	pthread_t		check;
 	pthread_t		th[250];
@@ -65,8 +67,9 @@ typedef struct s_data
 
 ////*		 --the main functions--		*////
 int		initialisation(t_data *data);
-void	*inspection(t_data *data);
+void	*inspection(void *data);
 void	*daily(void *phil);
+void	message(const char *type, t_phil *p_phil, long time);
 
 ////*		 --utils--		*////
 int		ft_atoi(const char *str);
@@ -77,5 +80,6 @@ void	my_usleep(int ms_time);
 t_phil	*phil_last(t_phil *lst);
 t_phil	*new_phil(t_data *data, int id);
 int		ft_lstadd_back(t_phil **lst, t_phil *new);
+void	ft_lstclear(t_phil **lst);
 
 #endif
